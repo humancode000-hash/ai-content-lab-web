@@ -1,404 +1,338 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI CONTENT LAB — Упаковка товаров и короткие видео для маркетплейсов</title>
-  <meta name="description" content="Создаём продающие карточки товаров и короткие видео (Reels, Shorts, клипы) для Kaspi, Wildberries и Ozon под быстрый клик. Тест-спринт — 14 900 ₸, подписка GROWTH — 39 900 ₸/мес." />
+  <title>AI CONTENT LAB — Карточки товаров и Reels/Shorts для селлеров</title>
   <style>
     :root {
-      --bg: #090c12;
-      --surface: #111622;
-      --surface-2: #171e2e;
-      --text: #f5f8fc;
+      --bg: #0b0f17;
+      --card: #131a26;
+      --card-2: #192232;
+      --text: #f3f6fb;
       --muted: #9aa7bd;
-      --line: rgba(255, 255, 255, 0.09);
-      --accent: #38bdf8;
-      --accent-ink: #041018;
-      --green: #22c55e;
-      --warn: #f59e0b;
+      --accent: #22c55e;
+      --accent-hover: #16a34a;
+      --border: rgba(255, 255, 255, 0.1);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
+    * { box-sizing: border-box; }
     body {
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 42%), var(--bg);
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
       color: var(--text);
-      line-height: 1.58;
+      line-height: 1.55;
     }
-    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px 18px 64px;
+    }
     header {
-      position: sticky; top: 0; z-index: 20;
-      backdrop-filter: blur(12px);
-      background: rgba(9, 12, 18, 0.82);
-      border-bottom: 1px solid var(--line);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
     }
-    .nav {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 16px; min-height: 68px;
+    .brand {
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      text-decoration: none;
     }
-    .logo {
-      font-weight: 900; letter-spacing: 0.07em; font-size: 1.05rem;
-      color: var(--accent); text-decoration: none;
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      margin-left: 16px;
+      font-size: 0.95rem;
     }
-    .nav-links { display: flex; gap: 20px; flex-wrap: wrap; }
-    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.92rem; }
-    .nav-links a:hover { color: var(--text); }
+    nav a:hover { color: var(--text); }
+    .hero { padding: 32px 0 20px; }
+    .badge {
+      display: inline-block;
+      background: rgba(34, 197, 94, 0.14);
+      color: #86efac;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      margin-bottom: 14px;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(1.7rem, 4vw, 2.5rem);
+      line-height: 1.18;
+    }
+    .lead {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 740px;
+      margin: 0 0 20px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin: 20px 0 28px;
+    }
+    .box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .box h3 { margin: 0 0 8px; font-size: 1.02rem; }
+    .box p { margin: 0; color: var(--muted); font-size: 0.93rem; }
+    .offer-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.14), rgba(19, 26, 38, 0.95));
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 28px;
+    }
+    .price { font-size: 1.5rem; font-weight: 800; color: #86efac; }
     .btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 13px 20px; border-radius: 11px; font-weight: 700; font-size: 0.96rem;
-      text-decoration: none; border: 1px solid transparent; cursor: pointer; transition: 0.18s ease;
+      display: inline-block;
+      background: var(--accent);
+      color: #06110a;
+      font-weight: 700;
+      padding: 12px 18px;
+      border-radius: 10px;
+      border: 0;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 0.95rem;
     }
-    .btn-primary { background: var(--accent); color: var(--accent-ink); }
-    .btn-primary:hover { filter: brightness(1.06); }
-    .btn-ghost { background: rgba(255,255,255,0.04); color: var(--text); border-color: var(--line); }
-    .btn-ghost:hover { background: rgba(255,255,255,0.08); }
-    .btn-sm { padding: 9px 14px; font-size: 0.88rem; }
-
-    .hero { padding: 64px 0 44px; }
-    .pill {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 6px 13px; border-radius: 999px; font-size: 0.84rem; font-weight: 600;
-      background: rgba(56, 189, 248, 0.14); color: var(--accent); margin-bottom: 18px;
+    .btn:hover { background: var(--accent-hover); color: #fff; }
+    .btn-secondary {
+      background: var(--card-2);
+      color: var(--text);
+      border: 1px solid var(--border);
     }
-    h1 { font-size: clamp(2rem, 4.4vw, 3.35rem); line-height: 1.12; max-width: 860px; margin-bottom: 18px; }
-    .hero-sub { font-size: 1.1rem; color: var(--muted); max-width: 740px; margin-bottom: 28px; }
-    .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 34px; }
-    .metrics {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;
+    .btn-secondary:hover { background: #222e42; color: #fff; }
+    form {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      display: grid;
+      gap: 14px;
     }
-    .metric {
-      background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px;
-    }
-    .metric strong { display: block; font-size: 1.25rem; color: var(--text); }
-    .metric span { color: var(--muted); font-size: 0.88rem; }
-
-    section { padding: 54px 0; border-top: 1px solid var(--line); }
-    .sec-head { margin-bottom: 24px; max-width: 720px; }
-    .sec-head h2 { font-size: clamp(1.5rem, 3vw, 2.15rem); margin-bottom: 8px; }
-    .sec-head p { color: var(--muted); }
-
-    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 18px; }
-    .card {
-      background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px;
-    }
-    .card.featured { border-color: rgba(56, 189, 248, 0.45); background: linear-gradient(180deg, rgba(56,189,248,0.08), var(--surface)); }
-    .tag {
-      display: inline-block; font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.05em; color: var(--accent); margin-bottom: 8px;
-    }
-    .price { font-size: 1.85rem; font-weight: 900; color: var(--green); margin: 8px 0 12px; }
-    .card p { color: var(--muted); font-size: 0.96rem; }
-    ul.clean { list-style: none; margin-top: 14px; display: grid; gap: 9px; }
-    ul.clean li { color: var(--text); font-size: 0.94rem; padding-left: 20px; position: relative; }
-    ul.clean li::before { content: "•"; color: var(--accent); position: absolute; left: 4px; font-weight: 900; }
-
-    .switcher { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
-    .tab-btn {
-      padding: 10px 16px; border-radius: 10px; border: 1px solid var(--line);
-      background: var(--surface-2); color: var(--muted); font-weight: 700; cursor: pointer;
-    }
-    .tab-btn.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-    .demo-box {
-      background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px;
-    }
-    .script-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 16px; }
-    .step-card { background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
-    .step-card .time { color: var(--accent); font-weight: 800; font-size: 0.85rem; margin-bottom: 6px; }
-    .step-card p { color: var(--muted); font-size: 0.92rem; }
-
-    details {
-      background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 20px;
-    }
-    details + details { margin-top: 12px; }
-    summary { font-weight: 700; cursor: pointer; list-style: none; }
-    details p { margin-top: 10px; color: var(--muted); font-size: 0.94rem; }
-
-    .form-grid { display: grid; gap: 14px; max-width: 680px; }
+    label { display: grid; gap: 6px; font-size: 0.92rem; color: var(--muted); }
     input, select, textarea {
-      width: 100%; padding: 13px 15px; border-radius: 11px;
-      border: 1px solid var(--line); background: var(--surface-2);
-      color: var(--text); font-size: 0.96rem; font-family: inherit;
+      width: 100%;
+      padding: 11px 13px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.96rem;
+      font-family: inherit;
     }
-    input:focus, select:focus { outline: 2px solid rgba(56,189,248,0.45); border-color: var(--accent); }
-    .form-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-    .status-msg { font-size: 0.9rem; color: var(--green); min-height: 22px; margin-top: 6px; }
+    textarea { min-height: 110px; resize: vertical; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+    .status { margin-top: 10px; font-size: 0.92rem; color: #86efac; min-height: 22px; }
     footer {
-      border-top: 1px solid var(--line); padding: 28px 0 46px;
-      color: var(--muted); font-size: 0.88rem;
-      display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px;
-    }
-    @media (max-width: 720px) {
-      .nav-links { display: none; }
-      .hero { padding-top: 40px; }
+      margin-top: 44px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.88rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="wrap nav">
-      <a href="#" class="logo">AI CONTENT LAB</a>
-      <nav class="nav-links">
-        <a href="#why">Подход</a>
-        <a href="#pricing">Тарифы</a>
-        <a href="#demo">Пример подачи</a>
-        <a href="#faq">Вопросы</a>
+  <div class="wrap">
+    <header>
+      <a class="brand" href="#top">AI CONTENT LAB</a>
+      <nav>
+        <a href="#package">Что входит</a>
+        <a href="#order">Оформить заказ</a>
+        <a href="https://api.whatsapp.com/send/?phone=77000338978" target="_blank" rel="noopener">WhatsApp</a>
       </nav>
-      <a href="#lead" class="btn btn-primary btn-sm">Запустить тест</a>
-    </div>
-  </header>
+    </header>
 
-  <main>
-    <section class="hero" style="border-top:none;">
-      <div class="wrap">
-        <div class="pill">Kaspi • Wildberries • Ozon • Контент под быстрый клик</div>
-        <h1>Упаковываем товары под быстрый клик и импульсное решение</h1>
-        <p class="hero-sub">
-          На маркетплейсах и в коротких видео покупатель сначала считывает быструю пользу и жмёт «Купить»,
-          а уже потом думает об оплате. Собираем обложки, карточки и ролики (15–20 сек) за 2–4 дня без долгих созвонов.
-        </p>
-        <div class="cta-row">
-          <a href="#lead" class="btn btn-primary">Запустить тест-спринт — 14 900 ₸</a>
-          <a href="#demo" class="btn btn-ghost">Посмотреть разбор мини-пылесоса</a>
+    <section class="hero" id="top">
+      <div class="badge">AI CONTENT LAB · Маркетплейсы Kaspi / Ozon / Wildberries</div>
+      <h1>Продающие карточки товаров и сценарии Reels/Shorts под ключ после оплаты</h1>
+      <p class="lead">
+        Помогаем селлерам быстрее выводить товары в топ и повышать конверсию в заказ:
+        собираем сильные заголовки, УТП, характеристики, описание, структуру слайдов и сценарии
+        коротких вертикальных роликов без воды и лишних задержек.
+      </p>
+
+      <div class="offer-bar">
+        <div>
+          <div><strong>Пакет «Карточка + 3 Reels / Shorts»</strong></div>
+          <div style="color: var(--muted); font-size: 0.92rem;">
+            Заголовки · УТП · Характеристики · Описание · 6 слайдов · 3 сценария видео
+          </div>
         </div>
-        <div class="metrics">
-          <div class="metric"><strong>2–4 дня</strong><span>Срок подготовки тест-спринта</span></div>
-          <div class="metric"><strong>14 900 ₸</strong><span>Низкий вход на одном товаре</span></div>
-          <div class="metric"><strong>39 900 ₸ / мес</strong><span>Подписка GROWTH под поток задач</span></div>
-          <div class="metric"><strong>До 2 правок</strong><span>По исходному ТЗ без хаоса</span></div>
+        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+          <div class="price">от 25 000 ₸</div>
+          <a class="btn" href="#order">Передать заказ</a>
         </div>
       </div>
     </section>
 
-    <section id="why">
-      <div class="wrap">
-        <div class="sec-head">
-          <h2>Почему карточки и ролики теряют клики</h2>
-          <p>Когда продавец перегружает экран мелким текстом или длинным вступлением, покупатель пролистывает дальше.</p>
-        </div>
-        <div class="grid-3">
-          <div class="card">
-            <span class="tag">01 / Скорость считывания</span>
-            <h3>Главная выгода за 1–2 секунды</h3>
-            <p>Крупный акцент на то, какую задачу товар решает прямо сейчас — без полотен характеристик на обложке.</p>
-          </div>
-          <div class="card">
-            <span class="tag">02 / Живой сценарий</span>
-            <h3>Показ в деле, а не «в вакууме»</h3>
-            <p>Показываем быстрый результат и удобство использования так, чтобы покупатель сразу примерил товар на себя.</p>
-          </div>
-          <div class="card">
-            <span class="tag">03 / Понятный переход</span>
-            <h3>Без лишних барьеров до старта</h3>
-            <p>Короткий бриф из 4 пунктов и быстрый тест за 14 900 ₸ вместо недельных согласований.</p>
-          </div>
-        </div>
+    <section id="package" class="grid-3">
+      <div class="box">
+        <h3>1. Карточка товара под маркетплейс</h3>
+        <p>Цепляющие заголовки, понятные УТП, точные характеристики и продающее описание под требования площадки и покупателя.</p>
+      </div>
+      <div class="box">
+        <h3>2. Структура слайдов и Reels/Shorts</h3>
+        <p>Понятная логика слайдов и 3 сценария коротких видео (хук 0–3 сек, текст речи, текст на экране и раскадровка).</p>
+      </div>
+      <div class="box">
+        <h3>3. Моментальный маршрут в работу</h3>
+        <p>Заявка сразу уходит в WhatsApp, копируется в буфер и сохраняется в файл <code>order-jarvis.txt</code> для автоматизации.</p>
       </div>
     </section>
 
-    <section id="pricing">
-      <div class="wrap">
-        <div class="sec-head">
-          <h2>Тарифы под быстрый старт и регулярный рост</h2>
-          <p>Начните с теста на одной карточке/товаре или подключите постоянный контент-поток.</p>
-        </div>
-        <div class="grid-2">
-          <div class="card featured">
-            <span class="tag">Быстрый вход</span>
-            <h3>Тест-спринт</h3>
-            <div class="price">14 900 ₸</div>
-            <p>Идеально, чтобы проверить подачу на конкретном товаре за 2–4 дня.</p>
-            <ul class="clean">
-              <li>3 коротких вертикальных видео (15–20 сек) <strong>или</strong> 5 карточек/слайдов</li>
-              <li>Хуки и акценты под быстрый клик и импульсный спрос</li>
-              <li>До 2 кругов правок по исходному ТЗ</li>
-            </ul>
-            <div style="margin-top:20px;">
-              <a href="#lead" data-preset="Тест-спринт: 3 коротких видео — 14 900 ₸" class="btn btn-primary preset-btn">Выбрать тест-спринт</a>
-            </div>
-          </div>
+    <section id="order">
+      <h2 style="margin: 0 0 8px;">Карточка оплаченного заказа селлера</h2>
+      <p style="margin: 0 0 16px; color: var(--muted);">
+        Оплата принимается переводом по реквизитам с отправкой чека в WhatsApp. После подтверждения оплаты заявка сразу уходит в работу.
+      </p>
 
-          <div class="card">
-            <span class="tag">Постоянный поток</span>
-            <h3>Подписка GROWTH</h3>
-            <div class="price">39 900 ₸ / мес</div>
-            <p>Для регулярного обновления карточек, серийных видео и запусков новинок.</p>
-            <ul class="clean">
-              <li>Системная упаковка позиций и короткие ролики под акции/сезон</li>
-              <li>Единая подача под бренд и требования площадок</li>
-              <li>Экономия времени без поиска исполнителей под каждую задачу</li>
-            </ul>
-            <div style="margin-top:20px;">
-              <a href="#lead" data-preset="Подписка GROWTH — 39 900 ₸/мес" class="btn btn-ghost preset-btn">Подключить GROWTH</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+      <form id="orderForm">
+        <label>
+          Селлер / магазин / контакт
+          <input id="seller" type="text" placeholder="Данияр / Магазин «NordHome» / +7 707 412 88 90" required />
+        </label>
 
-    <section id="demo">
-      <div class="wrap">
-        <div class="sec-head">
-          <h2>Как устроена подача на импульсном товаре</h2>
-          <p>Переключите формат, чтобы посмотреть логику на примере беспроводного мини-пылесоса.</p>
-        </div>
-        <div class="switcher">
-          <button type="button" class="tab-btn active" data-tab="video">Короткое видео (15 сек)</button>
-          <button type="button" class="tab-btn" data-tab="cards">Карточки / обложки (5 слайдов)</button>
-        </div>
-        <div id="demoContent" class="demo-box"></div>
-      </div>
-    </section>
+        <label>
+          Маркетплейс и товар (полное наименование, модель, объём/размеры)
+          <input id="product" type="text" placeholder="Kaspi Магазин · Термос из нержавеющей стали «NordTherm 1000» (NT-1L-BLK), 1,0 л" required />
+        </label>
 
-    <section id="faq">
-      <div class="wrap">
-        <div class="sec-head">
-          <h2>Частые вопросы перед запуском</h2>
-          <p>Коротко о сроках, правках и формате работы.</p>
-        </div>
-        <details open>
-          <summary>С чего лучше начать, если раньше не заказывали упаковку?</summary>
-          <p>С <strong>Тест-спринта за 14 900 ₸</strong>: берём один товар (например, импульсный хит с высоким потенциалом клика), делаем 3 коротких видео или 5 карточек за 2–4 дня и оцениваем результат.</p>
-        </details>
-        <details>
-          <summary>Сколько длится работа и как устроены правки?</summary>
-          <p>Базовый срок тест-спринта — <strong>2–4 дня</strong>. В стоимость входит <strong>до 2 кругов правок</strong> по исходному ТЗ, чтобы мы быстро довели материалы до рабочего вида без затягивания.</p>
-        </details>
-        <details>
-          <summary>Нужен ли долгий созвон для старта?</summary>
-          <p>Нет. Достаточно заполнить короткий бриф из 4 пунктов ниже: ссылка/товар, главная выгода, формат и ваш контакт в мессенджере.</p>
-        </details>
-      </div>
-    </section>
+        <label>
+          Оплата и статус
+          <input id="payment" type="text" value="25 000 ₸ · Оплата переводом / чек в WhatsApp" required />
+        </label>
 
-    <section id="lead">
-      <div class="wrap">
-        <div class="sec-head">
-          <h2>Запустить проект за 4 шага</h2>
-          <p>Заполните поля — сформируем готовую заявку и откроем чат в WhatsApp (или скопируем текст в буфер).</p>
-        </div>
-        <form id="orderForm" class="form-grid">
-          <input id="inLink" type="text" placeholder="1. Ссылка на товар (Kaspi / WB / Ozon) или конкурента" required />
-          <input id="inBenefit" type="text" placeholder="2. Главная выгода покупателя (например: убирает крошки и авто без проводов)" required />
-          <select id="inFormat" required>
-            <option value="">3. Выберите формат старта</option>
-            <option value="Тест-спринт: 3 коротких видео — 14 900 ₸">Тест-спринт: 3 коротких видео — 14 900 ₸</option>
-            <option value="Тест-спринт: 5 карточек/слайдов — 14 900 ₸">Тест-спринт: 5 карточек/слайдов — 14 900 ₸</option>
-            <option value="Подписка GROWTH — 39 900 ₸/мес">Подписка GROWTH — 39 900 ₸/мес</option>
+        <label>
+          Маршрут передачи заказа
+          <select id="route">
+            <option value="WhatsApp + локальный Джарвис">Маршрут: WhatsApp + локальный Джарвис</option>
+            <option value="только WhatsApp">Маршрут: только WhatsApp</option>
+            <option value="только локальный Джарвис">Маршрут: только локальный Джарвис</option>
           </select>
-          <input id="inContact" type="text" placeholder="4. Ваш контакт (WhatsApp / Telegram / телефон)" required />
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Отправить в WhatsApp</button>
-            <button type="button" id="copyBtn" class="btn btn-ghost">Скопировать текст заявки</button>
-          </div>
-          <div id="statusMsg" class="status-msg"></div>
-        </form>
-      </div>
-    </section>
-  </main>
+        </label>
 
-  <footer>
-    <div class="wrap" style="display:flex; flex-wrap:wrap; justify-content:space-between; width:100%; gap:12px;">
-      <span><strong>AI CONTENT LAB</strong> — упаковка товаров под быстрый клик</span>
-      <span>Сроки: 2–4 дня • До 2 кругов правок по ТЗ</span>
-    </div>
-  </footer>
+        <label>
+          Характеристики, комплектация, гарантии и задача на реализацию
+          <textarea id="details" placeholder="Бренд, материал, размеры, вес, цвет, комплектация, гарантия, наличие фото/видео исходников и задача (карточка + слайды + 3 Reels/Shorts)..." required></textarea>
+        </label>
+
+        <div class="actions">
+          <button type="submit" class="btn">Отправить по маршруту</button>
+          <button type="button" id="copyBtn" class="btn btn-secondary">Копировать для Джарвиса</button>
+          <button type="button" id="downloadBtn" class="btn btn-secondary">Скачать .txt для Джарвиса</button>
+        </div>
+        <div id="status" class="status"></div>
+      </form>
+    </section>
+
+    <footer>
+      <div>© 2026 AI CONTENT LAB · Контент и автоматизация для селлеров</div>
+      <div>WhatsApp: +7 700 033 89 78</div>
+    </footer>
+  </div>
 
   <script>
-    const WHATSAPP_NUMBER = "77000338978"; // Замените на ваш номер WhatsApp (только цифры, без +)
+    const WHATSAPP_PHONE = "77000338978";
 
-    const DEMOS = {
-      video: `
-        <h3>Сценарий короткого ролика (15 сек) — беспроводной мини-пылесос</h3>
-        <p style="color:var(--muted); margin-top:6px;">Фокус: быстрая уборка без проводов и громоздкой техники, понятный визуал с первой секунды.</p>
-        <div class="script-steps">
-          <div class="step-card">
-            <div class="time">0–2 сек • ХУК</div>
-            <p>Крошки на сиденье авто или столе — крупный текст: <strong>«Крошки и пыль — за 5 секунд?»</strong></p>
-          </div>
-          <div class="step-card">
-            <div class="time">2–10 сек • ПОЛЬЗА</div>
-            <p>Быстрая уборка одной рукой: <strong>«Без проводов • Авто, клавиатура, узкие щели»</strong>.</p>
-          </div>
-          <div class="step-card">
-            <div class="time">10–15 сек • ИТОГ</div>
-            <p>Компактно убирается в бардачок: <strong>«Всегда под рукой • Смотри подробнее в карточке»</strong>.</p>
-          </div>
-        </div>
-      `,
-      cards: `
-        <h3>Логика серии карточек (5 слайдов) — беспроводной мини-пылесос</h3>
-        <p style="color:var(--muted); margin-top:6px;">Фокус: не перегружать слайды мелким шрифтом — каждый экран отвечает на один вопрос покупателя.</p>
-        <div class="script-steps">
-          <div class="step-card">
-            <div class="time">Слайд 1 • ОБЛОЖКА</div>
-            <p>Главный визуал + <strong>«Уберёт крошки и пыль за секунды • Без проводов»</strong>.</p>
-          </div>
-          <div class="step-card">
-            <div class="time">Слайды 2–3 • СЦЕНАРИИ</div>
-            <p>Показываем авто, стол и труднодоступные стыки — <strong>где выручает каждый день</strong>.</p>
-          </div>
-          <div class="step-card">
-            <div class="time">Слайды 4–5 • УДОБСТВО И КОМПЛЕКТ</div>
-            <p>Компактный размер, насадки и быстрый уход — <strong>без лишних слов и мелкого текста</strong>.</p>
-          </div>
-        </div>
-      `
-    };
+    function buildOrderText() {
+      const now = new Date().toLocaleString("ru-RU");
+      const seller = document.getElementById("seller").value.trim();
+      const product = document.getElementById("product").value.trim();
+      const payment = document.getElementById("payment").value.trim();
+      const route = document.getElementById("route").value;
+      const details = document.getElementById("details").value.trim();
 
-    const demoContent = document.getElementById("demoContent");
-    demoContent.innerHTML = DEMOS.video;
-
-    document.querySelectorAll(".tab-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        demoContent.innerHTML = DEMOS[btn.dataset.tab] || DEMOS.video;
-      });
-    });
-
-    const formatSelect = document.getElementById("inFormat");
-    document.querySelectorAll(".preset-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        if (btn.dataset.preset) {
-          formatSelect.value = btn.dataset.preset;
-        }
-      });
-    });
-
-    function buildLeadMessage() {
-      const link = document.getElementById("inLink").value.trim() || "не указана";
-      const benefit = document.getElementById("inBenefit").value.trim() || "не указана";
-      const format = document.getElementById("inFormat").value.trim() || "не выбран";
-      const contact = document.getElementById("inContact").value.trim() || "не указан";
       return [
-        "Заявка AI CONTENT LAB:",
-        `1. Товар/ссылка: ${link}`,
-        `2. Выгода: ${benefit}`,
-        `3. Формат: ${format}`,
-        `4. Контакт: ${contact}`
+        "AI CONTENT LAB — ЗАКАЗ КОНТЕНТА (ПОСЛЕ ОПЛАТЫ)",
+        "Время: " + now,
+        "Маршрут: " + route,
+        "Селлер/контакт: " + seller,
+        "Маркетплейс и товар: " + product,
+        "Оплата: " + payment,
+        "Детали реализации: " + details
       ].join("\n");
     }
 
-    const statusMsg = document.getElementById("statusMsg");
-    document.getElementById("orderForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const msg = buildLeadMessage();
-      statusMsg.textContent = "Открываем WhatsApp с готовой заявкой...";
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
+    function saveTxtFile(text) {
+      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "order-jarvis.txt";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      const text = buildOrderText();
+      const ok = await copyText(text);
+      document.getElementById("status").textContent = ok
+        ? "Текст заказа скопирован в буфер обмена для Джарвиса."
+        : "Не удалось скопировать автоматически — выделите поля вручную.";
     });
 
-    document.getElementById("copyBtn").addEventListener("click", async function () {
-      const msg = buildLeadMessage();
-      try {
-        await navigator.clipboard.writeText(msg);
-        statusMsg.textContent = "Текст заявки скопирован — можно вставить в любой чат или мессенджер.";
-      } catch {
-        statusMsg.textContent = "Выделите и скопируйте заявку вручную из формы.";
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      const text = buildOrderText();
+      saveTxtFile(text);
+      document.getElementById("status").textContent = "Файл order-jarvis.txt сохранён.";
+    });
+
+    document.getElementById("orderForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = buildOrderText();
+      const route = document.getElementById("route").value;
+      const copied = await copyText(text);
+
+      if (route.includes("Джарвис")) {
+        saveTxtFile(text);
       }
+
+      if (route.includes("WhatsApp")) {
+        const waUrl = "https://api.whatsapp.com/send/?phone=" + WHATSAPP_PHONE + "&text=" + encodeURIComponent(text);
+        window.open(waUrl, "_blank", "noopener");
+      }
+
+      const parts = [];
+      if (route.includes("WhatsApp")) parts.push("открыт WhatsApp (" + WHATSAPP_PHONE + ")");
+      if (copied) parts.push("текст скопирован в буфер");
+      if (route.includes("Джарвис")) parts.push("сохранён order-jarvis.txt");
+
+      document.getElementById("status").textContent = "Готово: " + (parts.join(", ") || "заказ сформирован") + ".";
     });
   </script>
 </body>
 </html>
-
