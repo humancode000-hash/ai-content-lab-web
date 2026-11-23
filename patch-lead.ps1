@@ -1,0 +1,1 @@
+$p = "C:\AI_CONTENT_LAB\web\components\LeadForm.tsx"; $t = [System.IO.File]::ReadAllText($p, [System.Text.Encoding]::UTF8); $t = $t -replace [string][char]0x0432+[char]0x0402+[char]0x2014, ([char]0x2014); [System.IO.File]::WriteAllText($p, $t, [System.Text.UTF8Encoding]::new($false)); Write-Output "DONE"
