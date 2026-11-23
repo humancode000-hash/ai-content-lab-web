@@ -1,4 +1,4 @@
-export type Lang = "ru" | "kz";
+﻿export type Lang = "ru" | "kz";
 
 export interface ServiceItem {
   id: string;
@@ -763,3 +763,4 @@ export const siteData: Record<
     ],
   },
 };
+
