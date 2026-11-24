@@ -5,7 +5,16 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LeadForm } from "@/components/LeadForm";
 import { ExtraHomeCasesBlock } from "@/components/ExtraHomeCasesBlock";
+import { BeforeAfterMediaBlock } from "@/components/BeforeAfterMediaBlock";
 import { siteData, type Lang } from "@/lib/siteData";
+
+function buildCardVisualSvg(label: string, accentHex: string, line1: string, line2: string) {
+  const safeLabel = label.replace(/[<>&"]/g, "");
+  const safe1 = line1.replace(/[<>&"]/g, "");
+  const safe2 = line2.replace(/[<>&"]/g, "");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="380" viewBox="0 0 900 380"><rect width="900" height="380" fill="#111622"/><rect x="28" y="28" width="844" height="324" rx="16" fill="#182032" stroke="${accentHex}" stroke-width="2"/><text x="56" y="84" fill="${accentHex}" font-family="Arial, sans-serif" font-size="22" font-weight="bold">${safeLabel}</text><text x="56" y="150" fill="#f8fafc" font-family="Arial, sans-serif" font-size="22">${safe1}</text><text x="56" y="205" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="18">${safe2}</text></svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
 
 export default function CasesPage() {
   const [lang, setLang] = useState<Lang>("ru");
@@ -26,72 +35,77 @@ export default function CasesPage() {
         </div>
 
         <div className="space-y-8">
-          {t.cases.map((c, idx) => (
-            <article
-              key={`${c.title}-${idx}`}
-              className="rounded-2xl border border-neutral-800 bg-neutral-900/70 p-6 space-y-5"
-            >
-              <div className="text-xs font-semibold uppercase tracking-wider text-cyan-400">
-                {String(idx + 1).padStart(2, "0")} • {c.category} • {c.productExample}
-              </div>
-              <h2 className="text-2xl font-bold text-white">{c.title}</h2>
+          {t.cases.map((c, idx) => {
+            const beforeImg = buildCardVisualSvg(
+              "ФОТО БЫЛО",
+              "#fb7185",
+              c.beforeText.slice(0, 62),
+              c.title
+            );
+            const afterImg = buildCardVisualSvg(
+              "ФОТО СТАЛО",
+              "#34d399",
+              c.coverHeadline,
+              c.afterHighlights[0] || c.coverBadge
+            );
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-xl border border-neutral-800 bg-neutral-950/70 p-4 space-y-2">
-                  <div className="text-xs font-semibold uppercase text-neutral-400">
-                    {cp.coverPreviewLabel}
-                  </div>
-                  <div className="text-base font-bold text-white">{c.coverHeadline}</div>
-                  <div className="text-sm text-neutral-300">{c.coverBadge}</div>
-                </div>
-                <div className="rounded-xl border border-neutral-800 bg-neutral-950/70 p-4 space-y-1.5">
-                  <div className="text-xs font-semibold uppercase text-neutral-400">
-                    {cp.slidesLabel}
-                  </div>
-                  {c.slideBullets.map((s) => (
-                    <div key={s} className="text-sm text-neutral-200">
-                      • {s}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-xl border border-rose-500/30 bg-rose-950/20 p-4 space-y-2">
-                  <div className="text-xs font-bold uppercase text-rose-300">
-                    {cp.beforeLabel}
-                  </div>
-                  <p className="text-sm text-neutral-200">{c.beforeText}</p>
-                </div>
-                <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4 space-y-2">
-                  <div className="text-xs font-bold uppercase text-emerald-300">
-                    {cp.afterLabel}
-                  </div>
-                  <ul className="space-y-1 text-sm text-emerald-100">
-                    {c.afterHighlights.map((item) => (
-                      <li key={item}>✓ {item}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-neutral-800 bg-neutral-950/70 p-4 space-y-2 text-sm text-neutral-300">
-                <p>
-                  <strong className="text-white">{cp.reelsLabel}:</strong> {c.reelsScript}
-                </p>
-                <p>
-                  <strong className="text-white">{cp.seoLabel}:</strong> {c.seoText}
-                </p>
-              </div>
-
-              <a
-                href="#order"
-                className="inline-flex items-center rounded-xl bg-cyan-500 px-4 py-2.5 text-sm font-semibold text-neutral-950 hover:bg-cyan-400"
+            return (
+              <article
+                key={`${c.title}-${idx}`}
+                className="rounded-2xl border border-neutral-800 bg-neutral-900/70 p-6 space-y-5"
               >
-                {cp.orderSimilarBtn}
-              </a>
-            </article>
-          ))}
+                <div className="text-xs font-semibold uppercase tracking-wider text-cyan-400">
+                  {String(idx + 1).padStart(2, "0")} • {c.category} • {c.productExample}
+                </div>
+                <h2 className="text-2xl font-bold text-white">{c.title}</h2>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="rounded-xl border border-neutral-800 bg-neutral-950/70 p-4 space-y-2">
+                    <div className="text-xs font-semibold uppercase text-neutral-400">
+                      {cp.coverPreviewLabel}
+                    </div>
+                    <div className="text-base font-bold text-white">{c.coverHeadline}</div>
+                    <div className="text-sm text-neutral-300">{c.coverBadge}</div>
+                  </div>
+                  <div className="rounded-xl border border-neutral-800 bg-neutral-950/70 p-4 space-y-1.5">
+                    <div className="text-xs font-semibold uppercase text-neutral-400">
+                      {cp.slidesLabel}
+                    </div>
+                    {c.slideBullets.map((s) => (
+                      <div key={s} className="text-sm text-neutral-200">
+                        • {s}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <BeforeAfterMediaBlock
+                  title={c.title}
+                  beforeImage={beforeImg}
+                  afterImage={afterImg}
+                  beforeCaption={c.beforeText}
+                  afterCaption={c.afterHighlights.join(" • ")}
+                  reelScript={c.reelsScript}
+                />
+
+                <div className="rounded-xl border border-neutral-800 bg-neutral-950/70 p-4 space-y-2 text-sm text-neutral-300">
+                  <p>
+                    <strong className="text-white">{cp.reelsLabel}:</strong> {c.reelsScript}
+                  </p>
+                  <p>
+                    <strong className="text-white">{cp.seoLabel}:</strong> {c.seoText}
+                  </p>
+                </div>
+
+                <a
+                  href="#order"
+                  className="inline-flex items-center rounded-xl bg-cyan-500 px-4 py-2.5 text-sm font-semibold text-neutral-950 hover:bg-cyan-400"
+                >
+                  {cp.orderSimilarBtn}
+                </a>
+              </article>
+            );
+          })}
         </div>
 
         <ExtraHomeCasesBlock />
