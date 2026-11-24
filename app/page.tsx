@@ -1,4 +1,3 @@
-import { MarketplaceCasesSection } from "./MarketplaceCasesSection";
 "use client";
 
 import Link from "next/link";
@@ -227,7 +226,7 @@ export default function HomePage() {
       </section>
 
       <SiteFooter lang={lang} />
-          <MarketplaceCasesSection />
-</main>
+          </main>
   );
 }
+
