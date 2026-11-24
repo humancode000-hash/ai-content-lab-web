@@ -762,5 +762,5 @@ export const siteData: Record<
       },
     ],
   },
-};
 
+};
