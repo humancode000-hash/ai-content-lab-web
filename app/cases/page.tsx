@@ -39,7 +39,7 @@ export default function CasesPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="rounded-xl border border-neutral-800 bg-neutral-950/70 p-4 space-y-2">
                   <div className="text-xs font-semibold uppercase text-neutral-400">
-                    {cp.coverLabel}
+                    {cp.coverPreviewLabel}
                   </div>
                   <div className="text-base font-bold text-white">{c.coverHeadline}</div>
                   <div className="text-sm text-neutral-300">{c.coverBadge}</div>
@@ -88,7 +88,7 @@ export default function CasesPage() {
                 href="#order"
                 className="inline-flex items-center rounded-xl bg-cyan-500 px-4 py-2.5 text-sm font-semibold text-neutral-950 hover:bg-cyan-400"
               >
-                {cp.ctaBtn}
+                {cp.orderSimilarBtn}
               </a>
             </article>
           ))}
