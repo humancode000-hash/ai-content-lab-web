@@ -1,3 +1,4 @@
+import { ExtraHomeCasesBlock } from "../../components/ExtraHomeCasesBlock";
 "use client";
 
 import { useState } from "react";
@@ -77,7 +78,41 @@ export default function CasesPage() {
                   <p className="mt-2 text-sm leading-6 text-slate-300">{c.beforeText}</p>
                 </div>
 
-                <div className="rounded-2xl border border-cyan-400/25 bg-[#090D18]/70 p-5">
+                <div className="rounded-2xl border border-cyan-400/25 bg-[#090D18,
+  {
+    id: "organizer-cosmetics",
+    num: "04",
+    category: "ДОМ И ХРАНЕНИЕ • ПОРЯДОК НА ПОЛКЕ",
+    format: "Фото/Видео Было-Стало + Карточка + Reels + SEO",
+    title: "Органайзер для косметики и уходовых средств",
+    beforePhoto: "/cases/organizer-before.svg",
+    afterPhoto: "/cases/organizer-after.svg",
+    before: "Флаконы, баночки и уход стоят вперемешку на полке, тусклый кадр и нет акцента на ярусах и отсеках.",
+    after: [
+      "Чистая подача с понятным разделением под флаконы и мелочи",
+      "Сразу закрыты вопросы вместимости, обзора и порядка",
+      "Готовый сценарий Reels/Shorts и SEO-текст под маркетплейс"
+    ],
+    reel: "0–3с (Было): хаос на полке, баночки мешают друг другу. 3–18с (Стало): быстрая раскладка по отсекам и аккуратный порядок — подробности в карточке.",
+    seo: "Органайзер для косметики и уходовых средств с удобными отсеками для флаконов, баночек и аксессуаров: аккуратное хранение и порядок дома или в подарок."
+  },
+  {
+    id: "vacuum-bags-pump",
+    num: "05",
+    category: "ДОМ И ХРАНЕНИЕ • ЭКОНОМИЯ МЕСТА",
+    format: "Фото/Видео Было-Стало + Карточка + Reels + SEO",
+    title: "Вакуумные пакеты с ручным насосом для хранения вещей",
+    beforePhoto: "/cases/vacuum-before.svg",
+    afterPhoto: "/cases/vacuum-after.svg",
+    before: "Серое фото пакета без показа экономии места и объёма, неясно про насос и размеры в комплекте.",
+    after: [
+      "Наглядное до/после: вещи сжимаются до компактного объёма",
+      "Крупно показаны комплект с насосом, размеры и защита от пыли",
+      "Готовый сценарий Reels/Shorts и SEO-описание под поиск"
+    ],
+    reel: "0–3с (Было): объёмные вещи не помещаются в шкаф или чемодан. 3–18с (Стало): укладка, откачка воздуха насосом и компактный блок — детали в карточке.",
+    seo: "Вакуумные пакеты с ручным насосом для компактного хранения одежды, пледов и вещей в шкафу или чемодане: экономия места и защита от пыли и влаги."
+  }]/70 p-5">
                   <p className="text-xs font-semibold uppercase text-cyan-400">
                     {cp.afterLabel}
                   </p>
@@ -122,6 +157,8 @@ export default function CasesPage() {
       </section>
 
       <SiteFooter lang={lang} />
-    </main>
+    
+      <ExtraHomeCasesBlock />
+</main>
   );
 }

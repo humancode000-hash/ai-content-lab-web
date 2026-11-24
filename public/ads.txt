@@ -1,1 +1,1 @@
-google.com, pub-9759579822377727, DIRECT, f08c47fec0942fa0
+# ads.txt для ai-content-lab-web.vercel.app
