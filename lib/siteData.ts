@@ -1,6 +1,4 @@
-import { extraHomeCases } from "../components/ExtraHomeCasesBlock";
-import { extraSellerCases } from "../data/extra-seller-cases";
-export type Lang = "ru" | "kz";
+﻿export type Lang = "ru" | "kz";
 
 export interface ServiceItem {
   id: string;
@@ -128,6 +126,8 @@ export const siteData: Record<
     services: ServiceItem[];
     packages: PackageItem[];
     cases: CaseItem[];
+  }
+> = {
   ru: {
     nav: {
       home: "Главная",
@@ -762,5 +762,5 @@ export const siteData: Record<
       },
     ],
   },
-
 };
+
