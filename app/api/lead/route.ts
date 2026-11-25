@@ -64,7 +64,7 @@ export async function POST(request: Request) {
     };
 
     // Всегда пишем в лог (на Vercel это единственное место, где заявка остаётся).
-    console.log("NEW_LEAD", JSON.stringify(lead));
+    console.log("NEW_LEAD", JSON.stringify({ id: lead.id, createdAt: lead.createdAt, topic: lead.topic, lang: lead.lang }));
 
     // Файл только локально: на Vercel диск read-only.
     if (!process.env.VERCEL) {
