@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   verification: {
     other: {
       "...": "...",
-      "admitad-verification": "admitad_verification_code",
+"admitad-verification": "admitad_verification_code",
     },
   },
   title: "AI CONTENT LAB — AI-студия контента и автоматизации для бизнеса",
