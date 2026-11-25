@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   verification: {
     other: {
+      "...": "...",
       "admitad-verification": "admitad_verification_code",
     },
   },
