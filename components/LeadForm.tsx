@@ -31,6 +31,7 @@ export function LeadForm({
   initialService,
   defaultService,
   selectedService,
+  lang,
   className = '',
 }: LeadFormProps) {
   const preset = initialTopic || selectedService || defaultService || initialService || OPTIONS[0];
@@ -47,9 +48,9 @@ export function LeadForm({
     }
   }, [initialTopic, selectedService, defaultService, initialService]);
 
-  const buildMessage = () => {
+  const buildMessage = (ref: string) => {
     return [
-      'Здравствуйте! Новая заявка с сайта AI CONTENT LAB:',
+      `Здравствуйте! Новая заявка с сайта AI CONTENT LAB (№${ref}):`,
       `• Услуга / пакет: ${service}`,
       `• Имя: ${name.trim() || 'Не указано'}`,
       `• Контакт: ${contact.trim() || 'Не указан'}`,
@@ -57,23 +58,44 @@ export function LeadForm({
     ].join('\n');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const message = buildMessage();
+    const ref = Date.now().toString(36).slice(-5).toUpperCase();
+    const message = buildMessage(ref);
+    const waUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
 
+    // 1. Открываем WhatsApp сразу (иначе мобильные браузеры могут заблокировать окно)
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
+
+    // 2. Копия текста в буфер обмена (не критично, ошибки игнорируем)
     try {
-      if (navigator?.clipboard?.writeText) {
-        await navigator.clipboard.writeText(message);
-      }
+      navigator?.clipboard?.writeText(message).catch(() => {});
     } catch {
-      // Игнорируем ошибку буфера обмена, если браузер запретил доступ
+      // ничего
     }
 
-    const waUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
-    setStatusMsg('Текст заявки скопирован в буфер обмена. Открываем WhatsApp...');
-    window.open(waUrl, '_blank', 'noopener,noreferrer');
-  };
+    // 3. Сохраняем заявку в фоне, ошибки клиенту не показываем
+    try {
+      fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        keepalive: true,
+        body: JSON.stringify({
+          name: name.trim(),
+          contact: contact.trim(),
+          topic: service,
+          comment: `[${ref}] ${details.trim() || '—'}`,
+          lang: String(lang || '').toLowerCase() === 'kz' ? 'kz' : 'ru',
+        }),
+      }).catch(() => {});
+    } catch {
+      // ничего
+    }
 
+    setStatusMsg(
+      `Открываем WhatsApp... Если чат не открылся, нажмите «Написать в WhatsApp напрямую». Номер заявки: ${ref}`
+    );
+  };
   const directWaUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(
     'Здравствуйте! Хочу оформить заказ в AI CONTENT LAB.'
   )}`;
