@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const WHATSAPP_PHONE = '77000338978';
 
@@ -17,12 +17,35 @@ const OPTIONS = [
   'SCALE ПОДПИСКА — 79 900 ₸ / месяц',
 ];
 
-export default function LeadForm() {
-  const [service, setService] = useState(OPTIONS[0]);
+export type LeadFormProps = {
+  lang?: string;
+  initialTopic?: string;
+  initialService?: string;
+  defaultService?: string;
+  selectedService?: string;
+  className?: string;
+};
+
+export function LeadForm({
+  initialTopic,
+  initialService,
+  defaultService,
+  selectedService,
+  className = '',
+}: LeadFormProps) {
+  const preset = initialTopic || selectedService || defaultService || initialService || OPTIONS[0];
+  const [service, setService] = useState(preset);
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
   const [details, setDetails] = useState('');
   const [statusMsg, setStatusMsg] = useState('');
+
+  useEffect(() => {
+    const nextTopic = initialTopic || selectedService || defaultService || initialService;
+    if (nextTopic) {
+      setService(nextTopic);
+    }
+  }, [initialTopic, selectedService, defaultService, initialService]);
 
   const buildMessage = () => {
     return [
@@ -56,7 +79,7 @@ export default function LeadForm() {
   )}`;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className={`space-y-4 ${className}`}>
       <div>
         <label className="block text-sm mb-1">Услуга или пакет / подписка</label>
         <select
@@ -69,6 +92,11 @@ export default function LeadForm() {
               {opt}
             </option>
           ))}
+          {service && !OPTIONS.includes(service) && (
+            <option value={service} className="text-black">
+              {service}
+            </option>
+          )}
         </select>
       </div>
 
@@ -131,3 +159,5 @@ export default function LeadForm() {
     </form>
   );
 }
+
+export default LeadForm;
