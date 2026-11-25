@@ -23,6 +23,20 @@ interface StoredLead {
 const DATA_DIR = path.join(process.cwd(), "data");
 const LEADS_FILE = path.join(DATA_DIR, "leads.json");
 
+async function saveLeadToFile(lead: StoredLead) {
+  await mkdir(DATA_DIR, { recursive: true });
+  let existing: StoredLead[] = [];
+  try {
+    const raw = await readFile(LEADS_FILE, "utf8");
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) existing = parsed;
+  } catch {
+    existing = [];
+  }
+  existing.unshift(lead);
+  await writeFile(LEADS_FILE, JSON.stringify(existing, null, 2), "utf8");
+}
+
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as LeadPayload;
@@ -49,21 +63,17 @@ export async function POST(request: Request) {
       comment,
     };
 
-    await mkdir(DATA_DIR, { recursive: true });
+    // Всегда пишем в лог (на Vercel это единственное место, где заявка остаётся).
+    console.log("NEW_LEAD", JSON.stringify(lead));
 
-    let existing: StoredLead[] = [];
-    try {
-      const raw = await readFile(LEADS_FILE, "utf8");
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        existing = parsed;
+    // Файл только локально: на Vercel диск read-only.
+    if (!process.env.VERCEL) {
+      try {
+        await saveLeadToFile(lead);
+      } catch (fileErr) {
+        console.error("Local lead file error:", fileErr);
       }
-    } catch {
-      existing = [];
     }
-
-    existing.unshift(lead);
-    await writeFile(LEADS_FILE, JSON.stringify(existing, null, 2), "utf8");
 
     return NextResponse.json({ ok: true, leadId: lead.id });
   } catch (err) {
