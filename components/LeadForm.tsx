@@ -1,243 +1,133 @@
-"use client";
+'use client';
 
-import { FormEvent, useEffect, useState } from "react";
-import { Lang, siteData, STUDIO_CONTACTS } from "@/lib/siteData";
+import React, { useState } from 'react';
 
-interface LeadFormProps {
-  lang: Lang;
-  initialTopic?: string;
-}
+const WHATSAPP_PHONE = '77000338978';
 
-export function LeadForm({ lang, initialTopic }: LeadFormProps) {
-  const t = siteData[lang];
-  const f = t.form;
+const OPTIONS = [
+  'Карточки / контент для маркетплейса — подбор пакета',
+  'Карточки для маркетплейсов (от 2 500 ₸ / шт)',
+  'Reels и Shorts (от 5 000 ₸)',
+  'SEO и поисковые тексты (от 8 000 ₸)',
+  'Копирайтинг (от 1 500 ₸)',
+  'AI-визуал и креативы (от 2 000 ₸)',
+  'Конвейер с Джарвисом (от 15 000 ₸)',
+  'ТЕСТ-СПРИНТ — 14 900 ₸ разовый пакет',
+  'GROWTH ПОДПИСКА — 39 900 ₸ / месяц',
+  'SCALE ПОДПИСКА — 79 900 ₸ / месяц',
+];
 
-  const [selectedTopic, setSelectedTopic] = useState<string>(
-    initialTopic || f.topicDefault
-  );
-  const [name, setName] = useState("");
-  const [contact, setContact] = useState("");
-  const [comment, setComment] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [copied, setCopied] = useState(false);
+export default function LeadForm() {
+  const [service, setService] = useState(OPTIONS[0]);
+  const [name, setName] = useState('');
+  const [contact, setContact] = useState('');
+  const [details, setDetails] = useState('');
+  const [statusMsg, setStatusMsg] = useState('');
 
-  useEffect(() => {
-    if (initialTopic) {
-      setSelectedTopic(initialTopic);
-      setSubmitted(false);
-      setCopied(false);
-      setError(null);
-    }
-  }, [initialTopic]);
-
-  const getPlainLeadText = () => {
+  const buildMessage = () => {
     return [
-      "Заявка — AI CONTENT LAB",
-      `Направление: ${selectedTopic}`,
-      name.trim() ? `Имя: ${name.trim()}` : null,
-      contact.trim() ? `Контакт: ${contact.trim()}` : null,
-      comment.trim() ? `Детали: ${comment.trim()}` : null,
-    ]
-      .filter(Boolean)
-      .join("\n");
+      'Здравствуйте! Новая заявка с сайта AI CONTENT LAB:',
+      `• Услуга / пакет: ${service}`,
+      `• Имя: ${name.trim() || 'Не указано'}`,
+      `• Контакт: ${contact.trim() || 'Не указан'}`,
+      `• Задача / ссылка: ${details.trim() || 'Не указано'}`,
+    ].join('\n');
   };
 
-  const whatsappHref = `https://wa.me/${STUDIO_CONTACTS.whatsappPhone}?text=${encodeURIComponent(
-    getPlainLeadText()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const message = buildMessage();
+
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(message);
+      }
+    } catch {
+      // Игнорируем ошибку буфера обмена, если браузер запретил доступ
+    }
+
+    const waUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
+    setStatusMsg('Текст заявки скопирован в буфер обмена. Открываем WhatsApp...');
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  const directWaUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(
+    'Здравствуйте! Хочу оформить заказ в AI CONTENT LAB.'
   )}`;
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(getPlainLeadText());
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
-    }
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!name.trim() || !contact.trim()) {
-      setError(f.errorRequired);
-      return;
-    }
-
-    setError(null);
-    setLoading(true);
-
-    try {
-      await fetch("/api/lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.trim(),
-          contact: contact.trim(),
-          topic: selectedTopic,
-          comment: comment.trim(),
-          lang,
-        }),
-      });
-    } catch {
-      // Не блокируем отправку даже при сетевой ошибке
-    } finally {
-      setLoading(false);
-      setSubmitted(true);
-      setCopied(false);
-    }
-  };
-
-  const handleReset = () => {
-    setSubmitted(false);
-    setCopied(false);
-    setName("");
-    setContact("");
-    setComment("");
-    setError(null);
-  };
-
   return (
-    <div className="rounded-3xl border border-cyan-400/20 bg-[#111B2B] px-6 py-10 sm:px-10 sm:py-12">
-      {submitted ? (
-        <div className="rounded-2xl border border-cyan-400/30 bg-[#090D18]/80 p-6 text-center">
-          <p className="text-xl font-bold text-cyan-400">{f.successTitle}</p>
-          <p className="mt-2 text-sm text-slate-300">{f.successText}</p>
-          <pre className="mt-4 whitespace-pre-wrap rounded-xl bg-white/5 p-4 text-left text-xs text-slate-200">
-            {getPlainLeadText()}
-          </pre>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <a
-              href={whatsappHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-xl bg-cyan-400 px-6 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
-            >
-              {f.openWhatsappBtn}
-            </a>
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="rounded-xl border border-white/15 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:border-cyan-400 hover:text-cyan-400"
-            >
-              {copied ? f.copiedBtn : f.copyBtn}
-            </button>
-            <button
-              type="button"
-              onClick={handleReset}
-              className="rounded-xl border border-white/15 px-5 py-3 text-sm font-semibold text-slate-400 transition hover:text-white"
-            >
-              {f.resetBtn}
-            </button>
-          </div>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-          <div>
-            <label htmlFor="topic" className="block text-sm font-medium text-slate-200">
-              {f.topicLabel}
-            </label>
-            <select
-              id="topic"
-              value={selectedTopic}
-              onChange={(e) => setSelectedTopic(e.target.value)}
-              className="mt-2 w-full rounded-xl border border-white/15 bg-[#090D18] px-4 py-3 text-sm text-white focus:border-cyan-400 focus:outline-none"
-            >
-              <option value={f.topicDefault}>{f.topicDefault}</option>
-              {!t.services.some((s) => `${s.name} (${s.price})` === selectedTopic) &&
-                !t.packages.some((p) => `${p.name} — ${p.price} ${p.period}` === selectedTopic) &&
-                selectedTopic !== f.topicDefault && (
-                  <option value={selectedTopic}>{selectedTopic}</option>
-                )}
-              {t.services.map((s) => {
-                const label = `${s.name} (${s.price})`;
-                return (
-                  <option key={s.id} value={label}>
-                    {label}
-                  </option>
-                );
-              })}
-              {t.packages.map((p) => {
-                const label = `${p.name} — ${p.price} ${p.period}`;
-                return (
-                  <option key={p.id} value={label}>
-                    {label}
-                  </option>
-                );
-              })}
-            </select>
-          </div>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-sm mb-1">Услуга или пакет / подписка</label>
+        <select
+          value={service}
+          onChange={(e) => setService(e.target.value)}
+          className="w-full rounded-lg border px-3 py-2 bg-transparent"
+        >
+          {OPTIONS.map((opt) => (
+            <option key={opt} value={opt} className="text-black">
+              {opt}
+            </option>
+          ))}
+        </select>
+      </div>
 
-          <div className="grid gap-5 sm:grid-cols-2">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-200">
-                {f.nameLabel} *
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder={f.namePlaceholder}
-                className="mt-2 w-full rounded-xl border border-white/15 bg-[#090D18] px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label htmlFor="contact-input" className="block text-sm font-medium text-slate-200">
-                {f.phoneLabel} *
-              </label>
-              <input
-                id="contact-input"
-                type="text"
-                value={contact}
-                onChange={(e) => setContact(e.target.value)}
-                placeholder={f.phonePlaceholder}
-                className="mt-2 w-full rounded-xl border border-white/15 bg-[#090D18] px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
-              />
-            </div>
-          </div>
+      <div>
+        <label className="block text-sm mb-1">Ваше имя *</label>
+        <input
+          type="text"
+          required
+          placeholder="Например, Асет"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full rounded-lg border px-3 py-2 bg-transparent"
+        />
+      </div>
 
-          <div>
-            <label htmlFor="comment" className="block text-sm font-medium text-slate-200">
-              {f.commentLabel}
-            </label>
-            <textarea
-              id="comment"
-              rows={3}
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder={f.commentPlaceholder}
-              className="mt-2 w-full rounded-xl border border-white/15 bg-[#090D18] px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
-            />
-          </div>
+      <div>
+        <label className="block text-sm mb-1">Телефон или WhatsApp / Telegram *</label>
+        <input
+          type="text"
+          required
+          placeholder="+7 (777) 000-00-00 или @username"
+          value={contact}
+          onChange={(e) => setContact(e.target.value)}
+          className="w-full rounded-lg border px-3 py-2 bg-transparent"
+        />
+      </div>
 
-          {error && (
-            <p role="alert" className="text-sm font-medium text-rose-400">
-              {error}
-            </p>
-          )}
+      <div>
+        <label className="block text-sm mb-1">
+          Маркетплейс, ссылка на товар или задача (необязательно)
+        </label>
+        <textarea
+          rows={3}
+          placeholder="Например: Kaspi / Wildberries / Ozon, 5 карточек, 8 Reels, SEO-тексты..."
+          value={details}
+          onChange={(e) => setDetails(e.target.value)}
+          className="w-full rounded-lg border px-3 py-2 bg-transparent"
+        />
+      </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-xl bg-cyan-400 px-8 py-4 font-bold text-slate-950 transition hover:bg-cyan-300 disabled:opacity-60"
-          >
-            {loading ? f.submitting : f.submit}
-          </button>
-        </form>
-      )}
+      <div className="flex flex-wrap gap-3 pt-2">
+        <button
+          type="submit"
+          className="rounded-lg px-4 py-2 font-medium bg-cyan-400 text-black"
+        >
+          Сформировать заявку
+        </button>
 
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-3 border-t border-white/10 pt-6 text-sm">
         <a
-          href={whatsappHref}
+          href={directWaUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-xl border border-white/15 px-5 py-2.5 text-slate-200 transition hover:border-cyan-400 hover:text-cyan-400"
+          className="rounded-lg px-4 py-2 border"
         >
-          {f.directWhatsappBtn}
+          Написать в WhatsApp напрямую
         </a>
       </div>
-    </div>
+
+      {statusMsg && <p className="text-sm text-cyan-300">{statusMsg}</p>}
+    </form>
   );
 }
