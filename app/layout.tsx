@@ -13,12 +13,6 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  verification: {
-    other: {
-      "...": "...",
-"admitad-verification": "admitad_verification_code",
-    },
-  },
   title: "AI CONTENT LAB — AI-студия контента и автоматизации для бизнеса",
   description:
     "Создаём видео, Reels, дизайн, тексты, озвучку, презентации и AI-автоматизацию для бизнеса в Казахстане.",
