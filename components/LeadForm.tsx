@@ -1,21 +1,77 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useId, useState } from 'react';
 
 const WHATSAPP_PHONE = '77000338978';
 
-const OPTIONS = [
-  'Карточки / контент для маркетплейса — подбор пакета',
-  'Карточки для маркетплейсов (от 2 500 ₸ / шт)',
-  'Reels и Shorts (от 5 000 ₸)',
-  'SEO и поисковые тексты (от 8 000 ₸)',
-  'Копирайтинг (от 1 500 ₸)',
-  'AI-визуал и креативы (от 2 000 ₸)',
-  'Конвейер с Джарвисом (от 15 000 ₸)',
-  'ТЕСТ-СПРИНТ — 14 900 ₸ разовый пакет',
-  'GROWTH ПОДПИСКА — 39 900 ₸ / месяц',
-  'SCALE ПОДПИСКА — 79 900 ₸ / месяц',
+type Lang = 'ru' | 'kz';
+
+// value уходит в сообщение владельцу (по-русски), label показывается клиенту на его языке.
+const OPTIONS: { value: string; kz: string }[] = [
+  { value: 'Карточки / контент для маркетплейса — подбор пакета', kz: 'Маркетплейс карточкалары / контент — пакет таңдау' },
+  { value: 'Карточки для маркетплейсов (от 2 500 ₸ / шт)', kz: 'Маркетплейс карточкалары (2 500 ₸-ден / дана)' },
+  { value: 'Reels и Shorts (от 5 000 ₸)', kz: 'Reels және Shorts (5 000 ₸-ден)' },
+  { value: 'SEO и поисковые тексты (от 8 000 ₸)', kz: 'SEO және іздеу мәтіндері (8 000 ₸-ден)' },
+  { value: 'Копирайтинг (от 1 500 ₸)', kz: 'Копирайтинг (1 500 ₸-ден)' },
+  { value: 'AI-визуал и креативы (от 2 000 ₸)', kz: 'AI-визуал және креативтер (2 000 ₸-ден)' },
+  { value: 'Конвейер с Джарвисом (от 15 000 ₸)', kz: 'Жарвиспен конвейер (15 000 ₸-ден)' },
+  { value: 'ТЕСТ-СПРИНТ — 14 900 ₸ разовый пакет', kz: 'ТЕСТ-СПРИНТ — 14 900 ₸ бір реттік пакет' },
+  { value: 'GROWTH ПОДПИСКА — 39 900 ₸ / месяц', kz: 'GROWTH ЖАЗЫЛЫМ — 39 900 ₸ / ай' },
+  { value: 'SCALE ПОДПИСКА — 79 900 ₸ / месяц', kz: 'SCALE ЖАЗЫЛЫМ — 79 900 ₸ / ай' },
 ];
+
+const TEXT: Record<
+  Lang,
+  {
+    service: string;
+    name: string;
+    namePh: string;
+    contact: string;
+    contactPh: string;
+    details: string;
+    detailsPh: string;
+    submit: string;
+    direct: string;
+    errName: string;
+    errContact: string;
+    opening: string;
+    fallbackHint: string;
+    fallbackBtn: string;
+  }
+> = {
+  ru: {
+    service: 'Услуга или пакет / подписка',
+    name: 'Ваше имя *',
+    namePh: 'Например, Асет',
+    contact: 'Телефон или WhatsApp / Telegram *',
+    contactPh: '+7 (777) 000-00-00 или @username',
+    details: 'Маркетплейс, ссылка на товар или задача (необязательно)',
+    detailsPh: 'Например: Kaspi / Wildberries / Ozon, 5 карточек, 8 Reels, SEO-тексты...',
+    submit: 'Сформировать заявку',
+    direct: 'Написать в WhatsApp напрямую',
+    errName: 'Укажите имя.',
+    errContact: 'Укажите телефон или контакт для связи.',
+    opening: 'Открываем WhatsApp. Номер заявки: {ref}. Нажмите «Отправить» в чате, чтобы заявка дошла до нас.',
+    fallbackHint: 'Если чат не открылся, нажмите кнопку ниже.',
+    fallbackBtn: 'Открыть WhatsApp с заявкой',
+  },
+  kz: {
+    service: 'Қызмет немесе пакет / жазылым',
+    name: 'Атыңыз *',
+    namePh: 'Мысалы, Асет',
+    contact: 'Телефон немесе WhatsApp / Telegram *',
+    contactPh: '+7 (777) 000-00-00 немесе @username',
+    details: 'Маркетплейс, тауарға сілтеме немесе тапсырма (міндетті емес)',
+    detailsPh: 'Мысалы: Kaspi / Wildberries / Ozon, 5 карточка, 8 Reels, SEO мәтіндер...',
+    submit: 'Өтінім жасау',
+    direct: 'WhatsApp-қа тікелей жазу',
+    errName: 'Атыңызды көрсетіңіз.',
+    errContact: 'Байланыс үшін телефон немесе контакт көрсетіңіз.',
+    opening: 'WhatsApp ашылуда. Өтінім нөмірі: {ref}. Өтінім бізге жетуі үшін чатта «Жіберу» түймесін басыңыз.',
+    fallbackHint: 'Чат ашылмаса, төмендегі түймені басыңыз.',
+    fallbackBtn: 'Өтінімді WhatsApp-та ашу',
+  },
+};
 
 export type LeadFormProps = {
   lang?: string;
@@ -26,20 +82,44 @@ export type LeadFormProps = {
   className?: string;
 };
 
+function normalizeLang(lang?: string): Lang {
+  const l = String(lang ?? '').toLowerCase();
+  return l === 'kz' || l === 'kk' ? 'kz' : 'ru';
+}
+
+function makeRef(): string {
+  return Date.now().toString(36).slice(-5).toUpperCase();
+}
+
+type Status = { kind: 'idle' } | { kind: 'error'; text: string } | { kind: 'opened'; text: string; href: string };
+
 export function LeadForm({
+  lang,
   initialTopic,
   initialService,
   defaultService,
   selectedService,
-  lang,
   className = '',
 }: LeadFormProps) {
-  const preset = initialTopic || selectedService || defaultService || initialService || OPTIONS[0];
+  const L = normalizeLang(lang);
+  const t = TEXT[L];
+  const uid = useId();
+  const ids = {
+    service: `${uid}-service`,
+    name: `${uid}-name`,
+    contact: `${uid}-contact`,
+    details: `${uid}-details`,
+    status: `${uid}-status`,
+  };
+
+  const preset =
+    initialTopic || selectedService || defaultService || initialService || OPTIONS[0].value;
   const [service, setService] = useState(preset);
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
   const [details, setDetails] = useState('');
-  const [statusMsg, setStatusMsg] = useState('');
+  const [trap, setTrap] = useState('');
+  const [status, setStatus] = useState<Status>({ kind: 'idle' });
 
   useEffect(() => {
     const nextTopic = initialTopic || selectedService || defaultService || initialService;
@@ -48,73 +128,98 @@ export function LeadForm({
     }
   }, [initialTopic, selectedService, defaultService, initialService]);
 
-  const buildMessage = (ref: string) => {
-    return [
+  const known = OPTIONS.some((o) => o.value === service);
+
+  const buildMessage = (ref: string) =>
+    [
       `Здравствуйте! Новая заявка с сайта AI CONTENT LAB (№${ref}):`,
       `• Услуга / пакет: ${service}`,
       `• Имя: ${name.trim() || 'Не указано'}`,
       `• Контакт: ${contact.trim() || 'Не указан'}`,
       `• Задача / ссылка: ${details.trim() || 'Не указано'}`,
+      `• Язык сайта: ${L.toUpperCase()}`,
     ].join('\n');
-  };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const ref = Date.now().toString(36).slice(-5).toUpperCase();
+    if (trap) return; // скрытое поле для ботов
+
+    if (!name.trim()) {
+      setStatus({ kind: 'error', text: t.errName });
+      return;
+    }
+    if (contact.trim().length < 5) {
+      setStatus({ kind: 'error', text: t.errContact });
+      return;
+    }
+
+    const ref = makeRef();
     const message = buildMessage(ref);
     const waUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
 
-    // 1. Открываем WhatsApp сразу (иначе мобильные браузеры могут заблокировать окно)
+    // 1. Сначала открываем WhatsApp: действие пользователя не должно зависеть от сервера.
     window.open(waUrl, '_blank', 'noopener,noreferrer');
 
-    // 2. Копия текста в буфер обмена (не критично, ошибки игнорируем)
+    // 2. Копия текста в буфер обмена (не критично).
     try {
       navigator?.clipboard?.writeText(message).catch(() => {});
     } catch {
       // ничего
     }
 
-    // 3. Сохраняем заявку в фоне, ошибки клиенту не показываем
+    // 3. Служебная копия на сервер в фоне. Её сбой клиента не касается,
+    //    и мы не сообщаем, что заявка «сохранена»: заявка считается принятой после отправки в WhatsApp.
     try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
       fetch('/api/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         keepalive: true,
+        signal: controller.signal,
         body: JSON.stringify({
           name: name.trim(),
           contact: contact.trim(),
           topic: service,
           comment: `[${ref}] ${details.trim() || '—'}`,
-          lang: String(lang || '').toLowerCase() === 'kz' ? 'kz' : 'ru',
+          lang: L,
         }),
-      }).catch(() => {});
+      })
+        .catch(() => {})
+        .finally(() => clearTimeout(timer));
     } catch {
       // ничего
     }
 
-    setStatusMsg(
-      `Открываем WhatsApp... Если чат не открылся, нажмите «Написать в WhatsApp напрямую». Номер заявки: ${ref}`
-    );
+    setStatus({ kind: 'opened', text: t.opening.replace('{ref}', ref), href: waUrl });
   };
+
   const directWaUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(
-    'Здравствуйте! Хочу оформить заказ в AI CONTENT LAB.'
+    L === 'kz'
+      ? 'Сәлеметсіз бе! AI CONTENT LAB-қа тапсырыс бергім келеді.'
+      : 'Здравствуйте! Хочу оформить заказ в AI CONTENT LAB.'
   )}`;
 
+  const fieldClass = 'w-full rounded-lg border px-3 py-2 bg-transparent';
+
   return (
-    <form onSubmit={handleSubmit} className={`space-y-4 ${className}`}>
+    <form onSubmit={handleSubmit} className={`space-y-4 ${className}`} noValidate>
       <div>
-        <label className="block text-sm mb-1">Услуга или пакет / подписка</label>
+        <label htmlFor={ids.service} className="block text-sm mb-1">
+          {t.service}
+        </label>
         <select
+          id={ids.service}
           value={service}
           onChange={(e) => setService(e.target.value)}
-          className="w-full rounded-lg border px-3 py-2 bg-transparent"
+          className={fieldClass}
         >
           {OPTIONS.map((opt) => (
-            <option key={opt} value={opt} className="text-black">
-              {opt}
+            <option key={opt.value} value={opt.value} className="text-black">
+              {L === 'kz' ? opt.kz : opt.value}
             </option>
           ))}
-          {service && !OPTIONS.includes(service) && (
+          {service && !known && (
             <option value={service} className="text-black">
               {service}
             </option>
@@ -123,48 +228,69 @@ export function LeadForm({
       </div>
 
       <div>
-        <label className="block text-sm mb-1">Ваше имя *</label>
+        <label htmlFor={ids.name} className="block text-sm mb-1">
+          {t.name}
+        </label>
         <input
+          id={ids.name}
           type="text"
           required
-          placeholder="Например, Асет"
+          autoComplete="name"
+          maxLength={100}
+          placeholder={t.namePh}
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-lg border px-3 py-2 bg-transparent"
+          aria-invalid={status.kind === 'error' && !name.trim() ? true : undefined}
+          aria-describedby={status.kind === 'error' ? ids.status : undefined}
+          className={fieldClass}
         />
       </div>
 
       <div>
-        <label className="block text-sm mb-1">Телефон или WhatsApp / Telegram *</label>
+        <label htmlFor={ids.contact} className="block text-sm mb-1">
+          {t.contact}
+        </label>
         <input
+          id={ids.contact}
           type="text"
           required
-          placeholder="+7 (777) 000-00-00 или @username"
+          autoComplete="tel"
+          maxLength={100}
+          placeholder={t.contactPh}
           value={contact}
           onChange={(e) => setContact(e.target.value)}
-          className="w-full rounded-lg border px-3 py-2 bg-transparent"
+          aria-invalid={status.kind === 'error' && contact.trim().length < 5 ? true : undefined}
+          aria-describedby={status.kind === 'error' ? ids.status : undefined}
+          className={fieldClass}
         />
       </div>
 
       <div>
-        <label className="block text-sm mb-1">
-          Маркетплейс, ссылка на товар или задача (необязательно)
+        <label htmlFor={ids.details} className="block text-sm mb-1">
+          {t.details}
         </label>
         <textarea
+          id={ids.details}
           rows={3}
-          placeholder="Например: Kaspi / Wildberries / Ozon, 5 карточек, 8 Reels, SEO-тексты..."
+          maxLength={1000}
+          placeholder={t.detailsPh}
           value={details}
           onChange={(e) => setDetails(e.target.value)}
-          className="w-full rounded-lg border px-3 py-2 bg-transparent"
+          className={fieldClass}
         />
+      </div>
+
+      {/* Скрытое поле-ловушка для ботов: людям не видно и недоступно с клавиатуры */}
+      <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', height: 0, overflow: 'hidden' }}>
+        <label>
+          Website
+          <input type="text" tabIndex={-1} autoComplete="off" value={trap} onChange={(e) => setTrap(e.target.value)} />
+        </label>
       </div>
 
       <div className="flex flex-wrap gap-3 pt-2">
-        <button
-          type="submit"
-          className="rounded-lg px-4 py-2 font-medium bg-cyan-400 text-black"
-        >
-          Сформировать заявку
+        <button type="submit" className="rounded-lg px-4 py-2 font-medium bg-cyan-400 text-black">
+          {t.submit}
         </button>
 
         <a
@@ -173,11 +299,31 @@ export function LeadForm({
           rel="noopener noreferrer"
           className="rounded-lg px-4 py-2 border"
         >
-          Написать в WhatsApp напрямую
+          {t.direct}
         </a>
       </div>
 
-      {statusMsg && <p className="text-sm text-cyan-300">{statusMsg}</p>}
+      <div id={ids.status} aria-live="polite">
+        {status.kind === 'error' && (
+          <p role="alert" className="text-sm text-red-400">
+            {status.text}
+          </p>
+        )}
+        {status.kind === 'opened' && (
+          <div className="space-y-2">
+            <p className="text-sm text-cyan-300">{status.text}</p>
+            <p className="text-sm opacity-80">{t.fallbackHint}</p>
+            <a
+              href={status.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block rounded-lg px-4 py-2 border"
+            >
+              {t.fallbackBtn}
+            </a>
+          </div>
+        )}
+      </div>
     </form>
   );
 }
