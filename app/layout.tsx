@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "AI CONTENT LAB — AI-студия контента и автоматизации для бизнеса",
   description:
-    "Создаём видео, Reels, дизайн, тексты, озвучку, презентации и AI-автоматизацию для бизнеса в Казахстане.",
+    "Карточки товаров для Kaspi, Wildberries и Ozon, Reels и Shorts, копирайтинг и SEO для продавцов в Казахстане.",
   keywords: [
     "AI контент",
     "Reels",
